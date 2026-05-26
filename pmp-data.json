@@ -1,0 +1,102 @@
+[
+  {
+    "question": "A project manager is planning the construction of a new Public Library. The community and project stakeholders are having difficulty agreeing on the key features to be included in the final design. What should the project manager do?",
+    "options": [
+      "A. Facilitate a workshop to gather input from all stakeholders",
+      "B. Define the difference between essential and non-essential features",
+      "C. Involve design consultant to mediate stakeholder discussions",
+      "D. Identify the root cause of the stakeholder inability to agree on the project scope"
+    ],
+    "answer": "D. Identify the root cause of the stakeholder inability to agree on the project scope"
+  },
+  {
+    "question": "A project manager convenes an emergency session with the software development team to address significant bugs that are delaying the Project's delivery. The product owner suggests conducting a root cause analysis to identify the underlying issues. What should the project manager do?",
+    "options": [
+      "A. Collaborate with the team to discuss the RCA suggestions and decide collectively on the next step",
+      "B. Encourage a lead developer to take charge of the RCA",
+      "C. Coordinate with the quality assurance lead to refine testing processes",
+      "D. Organize the session to ensure all team members contribute their insights"
+    ],
+    "answer": "A. Collaborate with the team to discuss the RCA suggestions and decide collectively on the next step"
+  },
+  {
+    "question": "A project manager overseeing the launch of a new e-commerce platform discovers that the finance department has concerns about not being involved in the cost estimations and their potential impact on the project Returns. What should the project manager do first?",
+    "options": [
+      "A. Amend the stakeholder engagement plan to better integrate Finance in future plans",
+      "B. Document the exclusion of the finance team as a risk to project success",
+      "C. Maintain the project timeline and plan a financial review before the Final Phase",
+      "D. Organize a meeting with the finance team to understand the concerns"
+    ],
+    "answer": "D. Organize a meeting with the finance team to understand the concerns"
+  },
+  {
+    "question": "As part of a project to integrate a new security feature into an online shopping platform, stakeholders have shown concerns over understanding the integration process during the planning phase. What should the project manager do to enhance stakeholders understanding of the integration?",
+    "options": [
+      "A. Schedule regular demonstration session during each Sprint to show progress and integration steps",
+      "B. Arrange for the technical team to provide a detailed explanation before each Sprint begins",
+      "C. Organize a training session to educate stakeholders on technical aspects",
+      "D. Provide detailed documentation on the integration process prior to the start of each Sprint phase"
+    ],
+    "answer": "A. Schedule regular demonstration session during each Sprint to show progress and integration steps"
+  },
+  {
+    "question": "A project manager is preparing for the Sprint planning sessions for a new feature in a Health Care system. This meeting aims to determine the amount of work for the upcoming Sprint. What two pieces of information are essential for the project manager to ensure the meeting is productive?",
+    "options": [
+      "A. Team performance metrics and a detail product backlog",
+      "B. Updated risk assessment and product Marketplace goal",
+      "C. Current project phase timeline and team performance metrics",
+      "D. Detail product backlog and current project phase timeline"
+    ],
+    "answer": "A. Team performance metrics and a detail product backlog"
+  },
+  {
+    "question": "A project manager is leading an internet biotechnology research project characterized by significant ambiguity and unpredictability. A suggestion has been made to introduce a system to engage the quality of the project outputs effectively. What hybrid technique should the project manager employ to ensure quality assurance?",
+    "options": [
+      "A. Combine weekly Sprints with quarterly external audits",
+      "B. Merge traditional Milestone reviews with agile Sprint demonstrations",
+      "C. Adapt peer programming and customer feedback sessions",
+      "D. Integrate continuous integration tools with formal quality control checkpoints"
+    ],
+    "answer": "C. Adapt peer programming and customer feedback sessions"
+  },
+  {
+    "question": "A project manager is overseeing a software development project where the team has prioritized creating a new user authentication system in the current Sprint. Midway through the Sprint, two developers express a desire to divert their efforts to optimize database queries, anticipating future performance bottlenecks. What should you do next?",
+    "options": [
+      "A. Allocate time for developers to present their optimization proposal at the next Sprint planning meeting, reinforcing importance of adhering to the Sprint's primary goal",
+      "B. Request a special session to assess the potential impact of the database optimization on future Sprints",
+      "C. Support the developers initiative by allocating a small portion of their time to start preliminary work on the database",
+      "D. Reassign the authentication system tasks to other team members"
+    ],
+    "answer": "A. Allocate time for developers to present their optimization proposal at the next Sprint planning meeting, reinforcing importance of adhering to the Sprint's primary goal"
+  },
+  {
+    "question": "A project manager is overseeing the development of an enterprise resource planning system and is decided that a combination of scrum and kanban methodologies would be most effective. However, the product owner is unsure about how to begin optimizing and prioritizing work. What should the project manager do?",
+    "options": [
+      "A. Guide the product owner on developing and optimizing a comprehensive product backlog",
+      "B. Have team members explain the integration of scrum and kanban principles to the product owner",
+      "C. Recommend the project team use visual management tools to improve workflow",
+      "D. Teach the product owner how to map out process flows to better understand task sequences"
+    ],
+    "answer": "A. Guide the product owner on developing and optimizing a comprehensive product backlog"
+  },
+  {
+    "question": "After unexpected last minute changes, the team worked overtime to meet tight deadlines. The sponsors allocated a monetary award to recognize the team efforts based on the project management practice. What is the most appropriate action for the project manager?",
+    "options": [
+      "A. Distribute the entire award to the team member who worked the longest hours",
+      "B. Organize a team building retreat to enhance moral for future projects",
+      "C. Use the award to fund professional development opportunity to benefit the team in future projects",
+      "D. Decide how to distribute the award based on informal feedback from the team"
+    ],
+    "answer": "C. Use the award to fund professional development opportunity to benefit the team in future projects"
+  },
+  {
+    "question": "A project manager is overseeing the construction of a new community Recreation Center which needs to be developed quickly to meet the community's expectation. The team is skilled, stakeholders are engaged. What should the project manager do to prioritize timely completion?",
+    "options": [
+      "A. Assign more resources to critical tasks without consulting the team",
+      "B. Develop a Milestone based plan ensuring regular stakeholder involvement and communication",
+      "C. Monitor Daily Progress in a way that integrates input from team members to ensure alignment with project goals",
+      "D. Request an extension on the project deadline from sponsor"
+    ],
+    "answer": "B. Develop a Milestone based plan ensuring regular stakeholder involvement and communication"
+  }
+]
