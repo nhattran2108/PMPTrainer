@@ -544,6 +544,7 @@ function confirmImport(){
 function toggleSidebar(){
   var sb=document.getElementById('sidebar');
   var ov=document.getElementById('sidebar-overlay');
+  if(!sb) return;
   var isOpen=sb.classList.contains('open');
   sb.classList.toggle('open',!isOpen);
   ov.classList.toggle('open',!isOpen);
@@ -555,6 +556,25 @@ function closeSidebar(){
   if(sb) sb.classList.remove('open');
   if(ov) ov.classList.remove('open');
 }
+
+// Wire hamburger — touchend avoids 300ms iOS click delay
+(function(){
+  var ham=document.getElementById('hamburger');
+  var ov=document.getElementById('sidebar-overlay');
+  if(ham){
+    ham.addEventListener('touchend',function(e){
+      e.preventDefault();
+      toggleSidebar();
+    },{passive:false});
+    ham.addEventListener('click',toggleSidebar);
+  }
+  if(ov){
+    ov.addEventListener('touchend',function(e){
+      e.preventDefault();
+      closeSidebar();
+    },{passive:false});
+  }
+})();
 
 // Close sidebar when navigating on mobile
 var origShowView = showView;
