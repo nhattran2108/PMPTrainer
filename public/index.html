@@ -8,9 +8,9 @@
 <style>
 :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3348;--accent:#6c8eff;--accent2:#a78bfa;--success:#34d399;--danger:#f87171;--warning:#fbbf24;--text:#e8eaf6;--muted:#8892b0;--card-radius:16px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-#app{display:flex;height:100vh;overflow:hidden}
-#sidebar{width:248px;min-width:248px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 12px;gap:5px;overflow-y:auto}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:-webkit-fill-available}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:248px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 12px;gap:5px;overflow-y:auto;-webkit-overflow-scrolling:touch;z-index:50}
+#app{margin-left:248px;height:100vh;height:100dvh;height:-webkit-fill-available;display:flex;flex-direction:column;overflow:hidden}
 .logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent);margin-bottom:12px;padding:0 6px}
 .logo span{color:var(--muted);font-size:11px;display:block;font-family:'DM Sans',sans-serif;margin-top:2px}
 .nav-btn{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px;font-family:inherit;width:100%;text-align:left;transition:all .15s}
@@ -28,7 +28,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .type-chip.active{border-color:var(--accent);background:rgba(108,142,255,.12);color:var(--accent)}
 .chip-count{font-size:10px;background:var(--border);padding:1px 6px;border-radius:10px}
 .type-chip.active .chip-count{background:rgba(108,142,255,.2);color:var(--accent)}
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#main{display:flex;flex-direction:column;height:100%;overflow:hidden}
 #topbar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);flex-wrap:wrap}
 .topbar-title{font-family:'DM Serif Display',serif;font-size:18px;white-space:nowrap}
 .progress-wrap{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);flex:1;flex-wrap:wrap}
@@ -184,12 +184,13 @@ select{background:var(--surface2);color:var(--text);border:1px solid var(--borde
 /* HAMBURGER */
 .hamburger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;margin-right:4px}
 .hamburger:hover{background:var(--surface2)}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 /* ── MOBILE ── */
 @media(max-width:768px){
   .hamburger{display:block}
-  #sidebar{position:fixed;left:-280px;top:0;bottom:0;width:260px;min-width:260px;z-index:50;transition:left .25s ease;box-shadow:none}
+  #app{margin-left:0}
+  #sidebar{left:-280px;width:260px;min-width:260px;transition:left .25s ease;box-shadow:none}
   #sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.4)}
   .sidebar-overlay.open{display:block}
   #topbar{padding:10px 14px;gap:8px}
@@ -330,42 +331,42 @@ if(SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_
     </div>
   </div>
 </div>
-<div id="app">
-  <div id="sidebar">
-    <div class="logo">PMP Trainer<span id="q-total-label">1,387 Questions</span></div>
-    <button class="nav-btn active" id="nav-practice" onclick="showView('practice')"><span class="nav-icon">&#128221;</span>Practice</button>
-    <button class="nav-btn" id="nav-dragdrop" onclick="showView('dragdrop')"><span class="nav-icon">&#128260;</span>Drag &amp; Drop (15)</button>
-    <button class="nav-btn" id="nav-dashboard" onclick="showView('dashboard')"><span class="nav-icon">&#128202;</span>Dashboard</button>
-    <button class="nav-btn" id="nav-exam" onclick="showView('exam')"><span class="nav-icon">&#9200;</span>Mock Exam</button>
-    <button class="nav-btn" id="nav-import" onclick="showView('import')"><span class="nav-icon">&#128229;</span>Import JSON</button>
-    <div class="nav-divider"></div>
-    <div class="type-filter">
-      <div class="type-filter-label">Filter by type</div>
-      <div class="type-chips">
-        <div class="type-chip active" id="chip-all" onclick="setTypeFilter('all')">All questions <span class="chip-count" id="chip-all-count">1387</span></div>
-        <div class="type-chip" id="chip-single" onclick="setTypeFilter('single_choice')">Single choice <span class="chip-count">1327</span></div>
-        <div class="type-chip" id="chip-multi" onclick="setTypeFilter('multi_select')">Multi-select <span class="chip-count">60</span></div>
-      </div>
-    </div>
-    <div class="nav-divider"></div>
-    <div class="stat-mini">Answered <strong id="sb-answered">0</strong></div>
-    <div class="stat-mini">Correct <strong id="sb-correct" style="color:var(--success)">0</strong></div>
-    <div class="stat-mini">Accuracy <strong id="sb-acc">--</strong></div>
-    <div class="nav-divider"></div>
-    <button class="nav-btn" onclick="exportSession()"><span class="nav-icon">&#128190;</span>Save Progress</button>
-    <button class="nav-btn" onclick="document.getElementById('import-session-file').click()"><span class="nav-icon">&#128194;</span>Load Progress</button>
-    <input type="file" id="import-session-file" accept=".json" style="display:none">
-    <button class="nav-btn" onclick="resetSession()" style="color:var(--danger)"><span class="nav-icon">&#128260;</span>Reset Session</button>
-    <div class="auth-bar" id="auth-bar">
-      <div class="auth-avatar" id="auth-avatar">?</div>
-      <div class="auth-info">
-        <div class="auth-name" id="auth-name">Not signed in</div>
-        <div class="auth-status offline" id="auth-status">Offline mode</div>
-      </div>
-      <button class="auth-btn-sm" id="auth-action-btn" onclick="openAuthModal()">Sign in</button>
+<div id="sidebar">
+  <div class="logo">PMP Trainer<span id="q-total-label">1,387 Questions</span></div>
+  <button class="nav-btn active" id="nav-practice" onclick="showView('practice')"><span class="nav-icon">&#128221;</span>Practice</button>
+  <button class="nav-btn" id="nav-dragdrop" onclick="showView('dragdrop')"><span class="nav-icon">&#128260;</span>Drag &amp; Drop (15)</button>
+  <button class="nav-btn" id="nav-dashboard" onclick="showView('dashboard')"><span class="nav-icon">&#128202;</span>Dashboard</button>
+  <button class="nav-btn" id="nav-exam" onclick="showView('exam')"><span class="nav-icon">&#9200;</span>Mock Exam</button>
+  <button class="nav-btn" id="nav-import" onclick="showView('import')"><span class="nav-icon">&#128229;</span>Import JSON</button>
+  <div class="nav-divider"></div>
+  <div class="type-filter">
+    <div class="type-filter-label">Filter by type</div>
+    <div class="type-chips">
+      <div class="type-chip active" id="chip-all" onclick="setTypeFilter('all')">All questions <span class="chip-count" id="chip-all-count">1387</span></div>
+      <div class="type-chip" id="chip-single" onclick="setTypeFilter('single_choice')">Single choice <span class="chip-count">1327</span></div>
+      <div class="type-chip" id="chip-multi" onclick="setTypeFilter('multi_select')">Multi-select <span class="chip-count">60</span></div>
     </div>
   </div>
-  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+  <div class="nav-divider"></div>
+  <div class="stat-mini">Answered <strong id="sb-answered">0</strong></div>
+  <div class="stat-mini">Correct <strong id="sb-correct" style="color:var(--success)">0</strong></div>
+  <div class="stat-mini">Accuracy <strong id="sb-acc">--</strong></div>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="exportSession()"><span class="nav-icon">&#128190;</span>Save Progress</button>
+  <button class="nav-btn" onclick="document.getElementById('import-session-file').click()"><span class="nav-icon">&#128194;</span>Load Progress</button>
+  <input type="file" id="import-session-file" accept=".json" style="display:none">
+  <button class="nav-btn" onclick="resetSession()" style="color:var(--danger)"><span class="nav-icon">&#128260;</span>Reset Session</button>
+  <div class="auth-bar" id="auth-bar">
+    <div class="auth-avatar" id="auth-avatar">?</div>
+    <div class="auth-info">
+      <div class="auth-name" id="auth-name">Not signed in</div>
+      <div class="auth-status offline" id="auth-status">Offline mode</div>
+    </div>
+    <button class="auth-btn-sm" id="auth-action-btn" onclick="openAuthModal()">Sign in</button>
+  </div>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div id="app">
   <div id="main">
     <div id="topbar">
       <button class="hamburger" id="hamburger" onclick="toggleSidebar()">&#9776;</button><div class="topbar-title" id="topbar-title">Practice</div>
