@@ -1,133 +1,122 @@
-# PMP Exam Trainer
+# PMP Trainer Cloud
 
-A comprehensive, offline-first PMP (Project Management Professional) exam practice application built as a single HTML file. No server required — just open `index.html` in your browser.
+PMP Exam Trainer with **cloud sync** via Supabase. Progress syncs across all your devices.
 
-![PMP Trainer](https://img.shields.io/badge/Questions-1387-blue) ![Drag Drop](https://img.shields.io/badge/Drag%20%26%20Drop-15-purple) ![License](https://img.shields.io/badge/License-MIT-green)
+## Quick Start (4 steps)
 
-## Features
+### Step 1: Create Supabase Project (2 min)
 
-### Practice Mode
-- **1,327 single-choice questions** — pick one correct answer from A/B/C/D
-- **60 multi-select questions** — choose 2-3 correct answers from A/B/C/D/E with smart UI that tracks your selection count and only enables submit when you've picked the right number
-- **Community vote distribution** — see how other exam takers voted after answering
-- **Instant explanations** — topic-based explanations covering 11 PMP domains (Agile, Risk, EVM, Stakeholder, Schedule, Quality, Procurement, Team, Change Control, Communications, General)
+1. Go to [supabase.com](https://supabase.com) → **Start your project** (free)
+2. Create a new project, pick a name and password
+3. Wait ~1 min for it to set up
 
-### Drag & Drop
-- **15 matching exercises** covering key PMP topics:
-  - Tuckman Ladder stages
-  - Risk response strategies
-  - Agile/Scrum ceremonies
-  - Conflict resolution techniques
-  - PMBOK Process Groups order
-  - Power types
-  - Communication model
-  - Organizational structures
-  - Earned Value formulas
-  - Leadership styles
-  - Stakeholder engagement levels
-  - Quality tools (7 basic tools)
-  - Procurement contract types
-  - Change request types
-  - Agile roles and responsibilities
+### Step 2: Run Database Schema (1 min)
 
-### Navigation & Modes
-- **Jump to any question** by entering its number
-- **3 practice modes:** Sequential, Random, Wrong-Only
-- **Filter by type:** All, Single Choice, Multi-select
-- **Progress tracking** with visual progress bar
+1. In Supabase Dashboard → **SQL Editor** → **New query**
+2. Copy-paste the contents of `sql/schema.sql`
+3. Click **Run** → all tables and policies are created
 
-### Import Custom Questions
-- Upload your own JSON question files
-- Supports multiple formats (array options, object options)
-- Auto-deduplication
-- Imported questions persist across sessions via localStorage
+### Step 3: Enable Google Login (optional, 2 min)
 
-### Dashboard
-- Overall accuracy and progress
-- Single choice vs Multi-select breakdown
-- Visual progress bar (correct/wrong/unanswered)
-- Quick access to wrong questions for review
+1. Supabase Dashboard → **Authentication** → **Providers**
+2. Enable **Google**
+3. Follow the instructions to set up Google OAuth credentials
+4. Or skip this — email/password login works without it
 
-## Getting Started
+### Step 4: Configure & Deploy (2 min)
 
-### Option 1: Open directly
+1. Get your credentials from Supabase Dashboard → **Settings** → **API**:
+   - `Project URL` (e.g., `https://abc123.supabase.co`)
+   - `anon public` key (starts with `eyJ...`)
+
+2. Edit `public/index.html`, find these 2 lines near the top:
+   ```js
+   var SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+   var SUPABASE_KEY  = 'YOUR_SUPABASE_ANON_KEY';
+   ```
+   Replace with your actual values:
+   ```js
+   var SUPABASE_URL  = 'https://abc123.supabase.co';
+   var SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIs...';
+   ```
+
+3. Deploy to Vercel:
+   ```bash
+   # Push to GitHub
+   git init
+   git remote add origin https://github.com/YOUR_USER/PMPTrainerCloud.git
+   git add .
+   git commit -m "PMP Trainer with cloud sync"
+   git push -u origin main
+
+   # Then go to vercel.com → New Project → select your repo → Deploy
+   ```
+
+4. Done! Visit your Vercel URL → Sign in → Progress syncs everywhere.
+
+## How Sync Works
+
 ```
-Just double-click index.html in your browser.
-```
-
-### Option 2: Serve locally
-```bash
-# Python
-python3 -m http.server 8080
-
-# Node.js
-npx serve .
-```
-
-Then open `http://localhost:8080` in your browser.
-
-## Import Custom Questions
-
-Go to **Import JSON** in the sidebar and upload a `.json` file with this format:
-
-```json
-[
-  {
-    "question": "What should the project manager do?",
-    "options": [
-      "A. Facilitate a workshop to gather input from all stakeholders",
-      "B. Define the difference between essential and non-essential features",
-      "C. Involve design consultant to mediate stakeholder discussions",
-      "D. Identify the root cause of the stakeholder inability to agree"
-    ],
-    "answer": "D. Identify the root cause of the stakeholder inability to agree"
-  }
-]
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  Device A    │     │   Supabase   │     │  Device B    │
+│  (laptop)    │────▶│   Database   │◀────│  (phone)     │
+│              │     │              │     │              │
+│ localStorage │     │  progress    │     │ localStorage │
+│ + cloud sync │     │  imports     │     │ + cloud sync │
+│              │     │  exam_history│     │              │
+└──────────────┘     └──────────────┘     └──────────────┘
 ```
 
-Also supports object-style options:
+- **Logged in**: Every answer auto-syncs to Supabase (debounced 2s)
+- **Not logged in**: Works offline with localStorage (same as before)
+- **Login on new device**: Cloud progress auto-loads and merges
+- **Conflict**: Whichever has more answered questions wins
 
-```json
-[
-  {
-    "question": "Which EVM metric indicates cost efficiency?",
-    "options": {
-      "A": "CPI",
-      "B": "SPI",
-      "C": "CV",
-      "D": "SV"
-    },
-    "correct": "A"
-  }
-]
-```
+## What Syncs
 
-## Data
-
-- `index.html` — Complete self-contained application (HTML + CSS + JS + embedded data)
-- `pmp_questions.json` — Raw extracted question data (1,387 questions) for external use
-
-## Tech Stack
-
-- **Zero dependencies** — Pure HTML/CSS/JS, no framework
-- **Single file** — Everything in one `index.html` (~1.1MB)
-- **Offline-first** — No network requests, works without internet
-- **localStorage** — Progress and imported questions persist across sessions
-- **Dark theme** — Easy on the eyes for long study sessions
-
-## Data Source
-
-Questions extracted from PMP Exam practice materials (ExamTopics, 527 pages PDF). Community vote distributions included where available.
+| Data | Synced | Storage |
+|------|--------|---------|
+| Practice progress (answered/correct/wrong) | ✅ | Supabase `progress` table |
+| Imported questions | ✅ | Supabase `imported_questions` table |
+| Mock exam history | ✅ | Supabase `exam_history` table |
+| Current question index & mode | ✅ | Supabase `progress` table |
+| Drag & drop state | ❌ | In-memory only (resets on reload) |
 
 ## Project Structure
 
 ```
-PMPTrainer/
-├── index.html            # Main application (self-contained)
-├── pmp_questions.json    # Raw question data for external use
-├── README.md             # This file
-└── CLAUDE.md             # AI development instructions
+PMPTrainerCloud/
+├── public/
+│   └── index.html          # Complete app (HTML + CSS + JS + data)
+├── sql/
+│   └── schema.sql          # Supabase database schema
+├── vercel.json             # Vercel deployment config
+├── package.json            # Project metadata
+├── .env.example            # Environment variables template
+├── CLAUDE.md               # AI development guide
+└── README.md               # This file
 ```
+
+## Security
+
+- **Supabase Anon Key** is public (safe to put in frontend code)
+- **Row Level Security (RLS)** ensures users can only read/write their own data
+- **Passwords** are hashed by Supabase Auth (bcrypt)
+- **No server-side code** needed — Supabase handles everything
+
+## Offline Mode
+
+The app works 100% without Supabase:
+- If `SUPABASE_URL` is not set → app uses localStorage only
+- If network is down → localStorage cache keeps working
+- Click "Skip - use offline" on the login modal
+
+## Cost
+
+Everything is free:
+- **Supabase Free Plan**: 500MB database, 50K auth users, unlimited API
+- **Vercel Free Plan**: 100GB bandwidth, custom domain, HTTPS
+- **No credit card** required for either
 
 ## License
 
