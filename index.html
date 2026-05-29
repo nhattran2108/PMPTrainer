@@ -176,6 +176,81 @@ select{background:var(--surface2);color:var(--text);border:1px solid var(--borde
 #toast.t-success{border-color:var(--success);color:var(--success)}
 #toast.t-error{border-color:var(--danger);color:var(--danger)}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* HAMBURGER */
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;margin-right:4px}
+.hamburger:hover{background:var(--surface2)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .hamburger{display:block}
+  #sidebar{position:fixed;left:-280px;top:0;bottom:0;width:260px;min-width:260px;z-index:50;transition:left .25s ease;box-shadow:none}
+  #sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.4)}
+  .sidebar-overlay.open{display:block}
+  #topbar{padding:10px 14px;gap:8px}
+  .topbar-title{font-size:16px}
+  .progress-wrap{gap:6px;font-size:11px}
+  .progress-bar{width:60px}
+  .jump-wrap{display:none}
+  #content{padding:14px}
+  .q-card{padding:18px;border-radius:12px}
+  .q-meta{gap:4px;margin-bottom:12px}
+  .badge{font-size:9px;padding:2px 7px}
+  .q-text{font-size:14px;line-height:1.7;margin-bottom:16px}
+  .opt-btn{padding:10px 12px;font-size:13px;border-radius:9px;gap:9px}
+  .opt-key{min-width:24px;height:24px;font-size:11px;border-radius:5px}
+  .action-row{gap:6px}
+  .btn{padding:8px 14px;font-size:12px}
+  .vote-row{font-size:11px}
+  .ai-box{padding:12px 14px;font-size:13px}
+  /* DD mobile */
+  .dd-layout{grid-template-columns:1fr;gap:12px}
+  .drag-item{padding:7px 10px;font-size:12px}
+  .drop-zone{min-height:44px}
+  .drop-label{font-size:9px}
+  .dropped-item{padding:16px 10px 5px;font-size:12px}
+  .dd-score-bar{gap:3px}
+  .dd-pip{width:18px;height:4px}
+  /* Exam mobile */
+  .exam-timer{padding:10px 12px;flex-wrap:wrap;gap:8px;border-radius:8px}
+  .timer-display{font-size:18px}
+  .timer-info{gap:10px;font-size:11px}
+  .exam-progress{gap:2px}
+  .exam-dot{width:10px;height:10px;border-radius:2px}
+  .exam-options{grid-template-columns:1fr;gap:8px}
+  .exam-opt{padding:12px}
+  .exam-result-score{font-size:48px}
+  /* Dashboard mobile */
+  .dash-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .dash-card{padding:12px}
+  .dash-val{font-size:22px}
+  /* Import mobile */
+  .import-card{padding:18px}
+  .import-stats{flex-direction:column;gap:8px}
+  .drop-area{padding:28px 14px}
+  /* Multi-hint */
+  .multi-hint{font-size:12px;padding:8px 12px}
+  .submit-row{font-size:12px}
+  /* Type filter sidebar */
+  .type-chip{padding:6px 8px;font-size:11px}
+  .stat-mini{font-size:11px;padding:4px 10px}
+  /* Flag btn */
+  .flag-btn{font-size:11px;padding:5px 8px}
+}
+
+@media(max-width:380px){
+  #topbar{padding:8px 10px}
+  .topbar-title{font-size:14px}
+  .progress-bar{display:none}
+  #content{padding:10px}
+  .q-card{padding:14px}
+  .q-text{font-size:13px}
+  .opt-btn{padding:9px 10px;font-size:12px}
+  .dash-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .dash-val{font-size:18px}
+  .exam-dot{width:8px;height:8px}
+}
 </style>
 </head>
 <body>
@@ -203,9 +278,10 @@ select{background:var(--surface2);color:var(--text);border:1px solid var(--borde
     <div class="nav-divider"></div>
     <button class="nav-btn" onclick="resetSession()" style="color:var(--danger)"><span class="nav-icon">&#128260;</span>Reset Session</button>
   </div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
   <div id="main">
     <div id="topbar">
-      <div class="topbar-title" id="topbar-title">Practice</div>
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">&#9776;</button><div class="topbar-title" id="topbar-title">Practice</div>
       <div class="progress-wrap">
         <span id="q-counter" style="white-space:nowrap">Q 1 / 1387</span>
         <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
@@ -511,7 +587,7 @@ function renderDragDrop(){
   var itemsHtml=q.drag_items.map(function(item,i){
     var isPlaced=Object.prototype.hasOwnProperty.call(state.placed,item);
     var enc=encodeURIComponent(item);
-    return '<div class="drag-item'+(isPlaced?' placed':'')+'" draggable="'+(!isPlaced&&!isDone)+'" ondragstart="dStart(event,\''+enc+'\')" ondragend="dEnd(event)">'+item+'</div>';
+    return '<div class="drag-item'+(isPlaced?' placed':'')+'" draggable="'+(!isPlaced&&!isDone)+'" ondragstart="dStart(event,\''+enc+'\')" ondragend="dEnd(event)" data-item="'+enc+'">'+item+'</div>';
   }).join('');
 
   var zonesHtml=q.drop_zones.map(function(zone){
@@ -765,7 +841,87 @@ function confirmImport(){
   var dupes=parsedPreview.length-toAdd.length;
   importedQuestions=importedQuestions.concat(toAdd);
   localStorage.setItem('pmp_imported',JSON.stringify(importedQuestions));
-  syncImported();
+  
+function toggleSidebar(){
+  var sb=document.getElementById('sidebar');
+  var ov=document.getElementById('sidebar-overlay');
+  var isOpen=sb.classList.contains('open');
+  sb.classList.toggle('open',!isOpen);
+  ov.classList.toggle('open',!isOpen);
+}
+
+// Close sidebar when navigating on mobile
+var origShowView = showView;
+showView = function(name){
+  origShowView(name);
+  var sb=document.getElementById('sidebar');
+  var ov=document.getElementById('sidebar-overlay');
+  if(sb) sb.classList.remove('open');
+  if(ov) ov.classList.remove('open');
+};
+
+
+// Touch-to-drag support for mobile drag & drop
+var touchDragItem = null;
+var touchClone = null;
+
+document.addEventListener('touchstart', function(e){
+  var item = e.target.closest('.drag-item');
+  if(!item || item.classList.contains('placed')) return;
+  touchDragItem = item.getAttribute('data-item') || item.textContent;
+  touchClone = item.cloneNode(true);
+  touchClone.style.position = 'fixed';
+  touchClone.style.zIndex = '1000';
+  touchClone.style.opacity = '0.8';
+  touchClone.style.pointerEvents = 'none';
+  touchClone.style.width = item.offsetWidth + 'px';
+  document.body.appendChild(touchClone);
+  item.classList.add('dragging');
+  e.preventDefault();
+}, {passive:false});
+
+document.addEventListener('touchmove', function(e){
+  if(!touchClone) return;
+  var t = e.touches[0];
+  touchClone.style.left = (t.clientX - 40) + 'px';
+  touchClone.style.top = (t.clientY - 20) + 'px';
+  // Highlight drop zone under finger
+  var elUnder = document.elementFromPoint(t.clientX, t.clientY);
+  document.querySelectorAll('.drop-zone').forEach(function(z){ z.classList.remove('drag-over'); });
+  if(elUnder){
+    var zone = elUnder.closest('.drop-zone');
+    if(zone) zone.classList.add('drag-over');
+  }
+  e.preventDefault();
+}, {passive:false});
+
+document.addEventListener('touchend', function(e){
+  if(!touchClone) return;
+  if(touchClone.parentNode) touchClone.parentNode.removeChild(touchClone);
+  document.querySelectorAll('.drag-item').forEach(function(d){ d.classList.remove('dragging'); });
+  document.querySelectorAll('.drop-zone').forEach(function(z){ z.classList.remove('drag-over'); });
+  // Find which drop zone was under the finger
+  var t = e.changedTouches[0];
+  var elUnder = document.elementFromPoint(t.clientX, t.clientY);
+  if(elUnder && touchDragItem){
+    var zone = elUnder.closest('.drop-zone');
+    if(zone){
+      var zoneId = zone.id.replace('zone-','');
+      var zoneName = decodeURIComponent(zoneId);
+      var q = DD_QUESTIONS[ddIdx];
+      if(!ddState[q.id]) ddState[q.id] = {placed:{},done:false};
+      if(!ddState[q.id].done){
+        Object.entries(ddState[q.id].placed).forEach(function(en){ if(en[1]===zoneName) delete ddState[q.id].placed[en[0]]; });
+        ddState[q.id].placed[touchDragItem] = zoneName;
+        renderDragDrop();
+      }
+    }
+  }
+  touchDragItem = null;
+  touchClone = null;
+});
+
+syncImported();
   parsedPreview=[];
   toast('Added '+toAdd.length+' questions!'+(dupes?' ('+dupes+' dupes skipped)':''),'success');
   renderImport();
