@@ -549,15 +549,40 @@ function toggleSidebar(){
   ov.classList.toggle('open',!isOpen);
 }
 
-// Close sidebar when navigating on mobile
-var origShowView = showView;
-showView = function(name){
-  origShowView(name);
+function closeSidebar(){
   var sb=document.getElementById('sidebar');
   var ov=document.getElementById('sidebar-overlay');
   if(sb) sb.classList.remove('open');
   if(ov) ov.classList.remove('open');
+}
+
+// Close sidebar when navigating on mobile
+var origShowView = showView;
+showView = function(name){
+  origShowView(name);
+  closeSidebar();
 };
+
+// Swipe left on sidebar to close
+(function(){
+  var startX=0, startY=0, tracking=false;
+  document.addEventListener('touchstart',function(e){
+    var t=e.touches[0];
+    startX=t.clientX; startY=t.clientY; tracking=true;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(!tracking) return;
+    var dx=e.touches[0].clientX-startX;
+    var dy=Math.abs(e.touches[0].clientY-startY);
+    // swipe left ≥ 50px, mostly horizontal
+    if(dx<-50 && dy<60){
+      tracking=false;
+      var sb=document.getElementById('sidebar');
+      if(sb && sb.classList.contains('open')) closeSidebar();
+    }
+  },{passive:true});
+  document.addEventListener('touchend',function(){ tracking=false; },{passive:true});
+})();
 
 
 // Touch-to-drag support for mobile drag & drop
