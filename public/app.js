@@ -540,8 +540,23 @@ function confirmImport(){
   var dupes=parsedPreview.length-toAdd.length;
   importedQuestions=importedQuestions.concat(toAdd);
   localStorage.setItem('pmp_imported',JSON.stringify(importedQuestions));
-  
+  syncImported();
+  parsedPreview=[];
+  toast('Added '+toAdd.length+' questions!'+(dupes?' ('+dupes+' dupes skipped)':''),'success');
+  renderImport();
+}
+
 function isMobile(){ return window.innerWidth<=768; }
+
+function updateSidebarCloseIcon(){
+  var btn=document.getElementById('sidebar-close-btn');
+  if(!btn) return;
+  if(isMobile()){
+    btn.innerHTML='&#10005;';
+  } else {
+    btn.innerHTML=document.body.classList.contains('nav-closed')?'&#8250;':'&#8249;';
+  }
+}
 
 function toggleSidebar(){
   if(isMobile()){
@@ -554,6 +569,7 @@ function toggleSidebar(){
   } else {
     var closed=document.body.classList.toggle('nav-closed');
     try{ localStorage.setItem('nav-closed', closed?'1':''); }catch(e){}
+    updateSidebarCloseIcon();
   }
 }
 
@@ -572,6 +588,7 @@ function closeSidebar(){
 // Restore desktop sidebar state
 (function(){
   try{ if(localStorage.getItem('nav-closed')) document.body.classList.add('nav-closed'); }catch(e){}
+  updateSidebarCloseIcon();
 })();
 
 // Wire hamburger — touchend avoids 300ms iOS click delay
@@ -687,11 +704,6 @@ document.addEventListener('touchend', function(e){
   touchClone = null;
 });
 
-syncImported();
-  parsedPreview=[];
-  toast('Added '+toAdd.length+' questions!'+(dupes?' ('+dupes+' dupes skipped)':''),'success');
-  renderImport();
-}
 
 function clearImported(){
   if(!confirm('Remove all '+importedQuestions.length+' imported questions?')) return;

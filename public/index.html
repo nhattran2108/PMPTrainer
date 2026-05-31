@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>PMP Exam Trainer</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3348;--accent:#6c8eff;--accent2:#a78bfa;--success:#34d399;--danger:#f87171;--warning:#fbbf24;--text:#e8eaf6;--muted:#8892b0;--card-radius:16px}
@@ -185,12 +186,14 @@ select{background:var(--surface2);color:var(--text);border:1px solid var(--borde
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* HAMBURGER */
-.hamburger{display:block;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:6px;margin-right:4px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-.hamburger:hover{background:var(--surface2)}
+.hamburger{display:block;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:5px 8px;border-radius:6px;margin-right:2px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;transition:all .15s}
+.hamburger:hover{background:var(--surface2);color:var(--text)}
+body.nav-closed .hamburger{color:var(--accent);background:rgba(108,142,255,.1)}
+body.nav-closed .hamburger:hover{background:rgba(108,142,255,.2)}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49;cursor:pointer;-webkit-tap-highlight-color:transparent;pointer-events:none}
 .sidebar-overlay.open{pointer-events:auto}
 .sidebar-logo-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-.sidebar-close{display:none;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1;touch-action:manipulation;-webkit-tap-highlight-color:transparent;flex-shrink:0;margin-top:2px}
+.sidebar-close{display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;width:28px;height:28px;border-radius:6px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;flex-shrink:0}
 .sidebar-close:hover{background:var(--surface2);color:var(--text)}
 
 /* ── MOBILE ── */
@@ -199,7 +202,7 @@ select{background:var(--surface2);color:var(--text);border:1px solid var(--borde
   #sidebar{left:0;width:85vw;max-width:300px;min-width:unset;transform:translateX(-100%);visibility:hidden;pointer-events:none;transition:transform .25s ease,visibility 0s linear .25s;box-shadow:none}
   #sidebar.open{transform:translateX(0);visibility:visible;pointer-events:auto;box-shadow:4px 0 24px rgba(0,0,0,.4);transition:transform .25s ease,visibility 0s linear 0s}
   .sidebar-overlay.open{display:block}
-  .sidebar-close{display:block}
+  .sidebar-close{font-size:22px}
   .logo{margin-bottom:0}
   #topbar{padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));gap:8px}
   .topbar-title{font-size:16px}
@@ -342,7 +345,7 @@ if(SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_
 <div id="sidebar">
   <div class="sidebar-logo-row">
     <div class="logo">PMP Trainer<span id="q-total-label">1,387 Questions</span></div>
-    <button class="sidebar-close" onclick="toggleSidebar()" title="Close menu">&#10005;</button>
+    <button class="sidebar-close" id="sidebar-close-btn" onclick="toggleSidebar()" title="Toggle menu">&#8249;</button>
   </div>
   <button class="nav-btn active" id="nav-practice" onclick="showView('practice')"><span class="nav-icon">&#128221;</span>Practice</button>
   <button class="nav-btn" id="nav-dragdrop" onclick="showView('dragdrop')"><span class="nav-icon">&#128260;</span>Drag &amp; Drop (15)</button>
