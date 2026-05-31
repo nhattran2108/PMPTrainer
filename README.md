@@ -2,121 +2,106 @@
 
 PMP Exam Trainer with **cloud sync** via Supabase. Progress syncs across all your devices.
 
-## Quick Start (4 steps)
+## Quick Start
 
-### Step 1: Create Supabase Project (2 min)
+### Step 1: Create Supabase Project
 
-1. Go to [supabase.com](https://supabase.com) → **Start your project** (free)
-2. Create a new project, pick a name and password
-3. Wait ~1 min for it to set up
+1. [supabase.com](https://supabase.com) → **Start your project** (free)
+2. Create new project → wait ~1 min
 
-### Step 2: Run Database Schema (1 min)
+### Step 2: Run Database Schema
 
-1. In Supabase Dashboard → **SQL Editor** → **New query**
-2. Copy-paste the contents of `sql/schema.sql`
-3. Click **Run** → all tables and policies are created
+1. Supabase Dashboard → **SQL Editor** → **New query**
+2. Paste contents of `public/schema.sql` → **Run**
 
-### Step 3: Enable Google Login (optional, 2 min)
+### Step 3: Add Flagged Questions Column
 
-1. Supabase Dashboard → **Authentication** → **Providers**
-2. Enable **Google**
-3. Follow the instructions to set up Google OAuth credentials
-4. Or skip this — email/password login works without it
+Run this migration in SQL Editor:
+```sql
+ALTER TABLE progress ADD COLUMN IF NOT EXISTS flagged jsonb DEFAULT '{}';
+```
 
-### Step 4: Configure & Deploy (2 min)
+### Step 4: Configure Credentials
 
-1. Get your credentials from Supabase Dashboard → **Settings** → **API**:
-   - `Project URL` (e.g., `https://abc123.supabase.co`)
-   - `anon public` key (starts with `eyJ...`)
+Edit `public/index.html`, find these 2 lines near the top:
+```js
+var SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+var SUPABASE_KEY  = 'YOUR_SUPABASE_ANON_KEY';
+```
+Replace with values from Supabase Dashboard → **Settings** → **API**.
 
-2. Edit `public/index.html`, find these 2 lines near the top:
-   ```js
-   var SUPABASE_URL  = 'YOUR_SUPABASE_URL';
-   var SUPABASE_KEY  = 'YOUR_SUPABASE_ANON_KEY';
-   ```
-   Replace with your actual values:
-   ```js
-   var SUPABASE_URL  = 'https://abc123.supabase.co';
-   var SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIs...';
-   ```
+### Step 5: Deploy to Vercel
 
-3. Deploy to Vercel:
-   ```bash
-   # Push to GitHub
-   git init
-   git remote add origin https://github.com/YOUR_USER/PMPTrainerCloud.git
-   git add .
-   git commit -m "PMP Trainer with cloud sync"
-   git push -u origin main
+```bash
+git init
+git remote add origin https://github.com/YOUR_USER/PMPTrainerCloud.git
+git add .
+git commit -m "init"
+git push -u origin main
+```
+Vercel → New Project → select repo → Deploy.
 
-   # Then go to vercel.com → New Project → select your repo → Deploy
-   ```
+Then: Supabase Dashboard → **Authentication** → **URL Configuration** → set **Site URL** to your Vercel URL.
 
-4. Done! Visit your Vercel URL → Sign in → Progress syncs everywhere.
+### Step 6: Enable Google Login (optional)
+
+Supabase Dashboard → **Authentication** → **Providers** → Enable **Google** → add OAuth credentials from Google Cloud Console.
+
+---
+
+## Features
+
+- 1,387 PMP practice questions
+- Practice mode & mock exam mode
+- Flag questions for review
+- Progress tracked per question (correct/wrong/skipped)
+- Cloud sync across devices (Supabase)
+- Offline mode (localStorage fallback)
+- Responsive: desktop push sidebar + mobile overlay sidebar
+- iOS scroll support for long questions
 
 ## How Sync Works
 
-```
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  Device A    │     │   Supabase   │     │  Device B    │
-│  (laptop)    │────▶│   Database   │◀────│  (phone)     │
-│              │     │              │     │              │
-│ localStorage │     │  progress    │     │ localStorage │
-│ + cloud sync │     │  imports     │     │ + cloud sync │
-│              │     │  exam_history│     │              │
-└──────────────┘     └──────────────┘     └──────────────┘
-```
-
-- **Logged in**: Every answer auto-syncs to Supabase (debounced 2s)
-- **Not logged in**: Works offline with localStorage (same as before)
-- **Login on new device**: Cloud progress auto-loads and merges
-- **Conflict**: Whichever has more answered questions wins
+- **Logged in**: Every answer auto-syncs (debounced 2s)
+- **Not logged in**: localStorage only (same as before)
+- **New device login**: Cloud progress loads and merges
+- **Conflict**: More answered questions wins
 
 ## What Syncs
 
-| Data | Synced | Storage |
-|------|--------|---------|
-| Practice progress (answered/correct/wrong) | ✅ | Supabase `progress` table |
-| Imported questions | ✅ | Supabase `imported_questions` table |
-| Mock exam history | ✅ | Supabase `exam_history` table |
-| Current question index & mode | ✅ | Supabase `progress` table |
-| Drag & drop state | ❌ | In-memory only (resets on reload) |
+| Data | Synced |
+|------|--------|
+| Practice progress (answered/correct/wrong) | ✅ |
+| Flagged questions | ✅ |
+| Imported questions | ✅ |
+| Mock exam history | ✅ |
+| Current question index & mode | ✅ |
 
 ## Project Structure
 
 ```
 PMPTrainerCloud/
 ├── public/
-│   └── index.html          # Complete app (HTML + CSS + JS + data)
-├── sql/
-│   └── schema.sql          # Supabase database schema
-├── vercel.json             # Vercel deployment config
-├── package.json            # Project metadata
-├── .env.example            # Environment variables template
-├── CLAUDE.md               # AI development guide
-└── README.md               # This file
+│   ├── index.html      # HTML + CSS
+│   ├── app.js          # All JS logic (questions, app, auth, sync)
+│   └── schema.sql      # Supabase database schema
+├── vercel.json
+├── package.json
+├── CLAUDE.md           # AI dev guide
+└── README.md
 ```
 
 ## Security
 
-- **Supabase Anon Key** is public (safe to put in frontend code)
-- **Row Level Security (RLS)** ensures users can only read/write their own data
-- **Passwords** are hashed by Supabase Auth (bcrypt)
-- **No server-side code** needed — Supabase handles everything
-
-## Offline Mode
-
-The app works 100% without Supabase:
-- If `SUPABASE_URL` is not set → app uses localStorage only
-- If network is down → localStorage cache keeps working
-- Click "Skip - use offline" on the login modal
+- Supabase Anon Key is public (safe in frontend)
+- Row Level Security (RLS): users only access their own data
+- Passwords hashed by Supabase Auth (bcrypt)
 
 ## Cost
 
-Everything is free:
-- **Supabase Free Plan**: 500MB database, 50K auth users, unlimited API
-- **Vercel Free Plan**: 100GB bandwidth, custom domain, HTTPS
-- **No credit card** required for either
+Both free tiers:
+- **Supabase**: 500MB DB, 50K auth users
+- **Vercel**: 100GB bandwidth, HTTPS, custom domain
 
 ## License
 

@@ -1,51 +1,94 @@
 # CLAUDE.md — AI Dev Guide for PMP Trainer Cloud
 
+## Dev Rules
+- Fix code directly, no explanations unless asked
+- Edit only files relevant to the task
+- No comments in code unless logic is non-obvious
+
+## File Structure
+
+```
+public/
+  index.html   # HTML + CSS only (no JS logic)
+  app.js       # ALL JS: questions array, app logic, auth, sync, sidebar
+sql/
+  schema.sql   # Supabase schema (run once in SQL Editor)
+```
+
 ## Architecture
 
-This is the cloud-synced version of PMP Trainer. It adds Supabase auth + database on top of the original single-file app.
-
-### Frontend (public/index.html)
-- Same single-file architecture as the original
-- Supabase JS client loaded from CDN
-- Auth modal (email/password + Google OAuth)
-- Auto-sync layer patches existing `saveSession()` and `confirmImport()`
+Cloud-synced PMP Trainer. Supabase auth + DB layered on top of localStorage app.
 
 ### Database (Supabase)
-- `profiles` — user info, auto-created on signup via trigger
-- `progress` — answered/correct/wrong/currentIdx/mode (1 row per user)
+- `profiles` — user info (auto-created via trigger on signup)
+- `progress` — answered/correct/wrong/currentIdx/mode/flagged (1 row per user)
 - `imported_questions` — user-uploaded question sets (1 row per user)
 - `exam_history` — mock exam results (many rows per user)
-- All tables have RLS policies: users only access their own data
+- RLS: users only access their own data
 
-### Sync Strategy
+### Sync
 - `saveToCloud()` — upserts progress + imported questions
 - `loadFromCloud()` — reads and merges with localStorage
-- `debouncedSync()` — called on every `saveSession()`, waits 2s before actual sync
-- Conflict resolution: whichever has more answered questions wins
+- `debouncedSync()` — called on every `saveSession()`, 2s debounce
+- Conflict resolution: more answered questions wins
 
 ### Auth Flow
-1. User clicks "Sign In" → modal opens
+1. "Sign In" → modal opens
 2. Email/password or Google OAuth
 3. On success → `onAuthSuccess()` → `loadFromCloud()`
-4. `supaClient.auth.onAuthStateChange()` handles Google redirect callback
+4. `supaClient.auth.onAuthStateChange()` handles Google redirect
 
 ## Critical Notes
 
 ### Supabase Credentials
-The anon key is PUBLIC and safe for frontend. It's embedded in index.html:
+Anon key is public/safe in frontend. Security via RLS, not key secrecy.
 ```js
 var SUPABASE_URL = 'https://xxx.supabase.co';
 var SUPABASE_KEY = 'eyJ...';
 ```
-Security comes from RLS policies, not key secrecy.
 
 ### Monkey-patching
-Auth/sync code patches existing functions without modifying them:
+Auth/sync patches existing functions without modifying originals:
 ```js
 var _origSaveSession = saveSession;
 saveSession = function(){ _origSaveSession(); debouncedSync(); };
 ```
-This keeps the original app code untouched and makes the auth layer removable.
 
 ### Offline Fallback
-If `SUPABASE_URL` equals `'YOUR_SUPABASE_URL'` (not configured), `supaClient` stays null and all sync functions silently skip. The app works exactly like the original localStorage-only version.
+If `SUPABASE_URL === 'YOUR_SUPABASE_URL'`, `supaClient` stays null, all sync silently skips.
+
+## Sidebar Architecture
+
+### Mobile (≤768px) — Overlay mode
+- Sidebar: `transform:translateX(-100%)` + `visibility:hidden` (off-screen)
+- Open: add `.open` class → `translateX(0)` + `visibility:visible`
+- Dark overlay (`#sidebar-overlay`) covers content when open
+- Close methods: X button inside sidebar, tap overlay, swipe left
+- Hamburger wired via `touchend` (avoids iOS 300ms click delay) + `click` fallback
+
+### Desktop (>768px) — Push mode
+- Sidebar always at `left:0`, `#app` has `margin-left:248px`
+- Toggle adds `body.nav-closed` → sidebar `translateX(-100%)`, app `margin-left:0`
+- State persisted in `localStorage('nav-closed')`
+
+### Key functions in app.js
+```js
+isMobile()         // returns window.innerWidth <= 768
+toggleSidebar()    // routes to mobile overlay or desktop push
+closeSidebar()     // closes without toggle
+```
+
+## iOS Scroll Fix
+All flex containers in the scroll chain need `min-height:0`:
+```
+body (overflow:hidden)
+ └─ #app (min-height:0, overflow:hidden)
+     └─ #main (min-height:0, overflow:hidden)
+         ├─ #topbar (flex-shrink:0)
+         └─ #content (min-height:0, overflow-y:auto) ← scroll here
+```
+
+## Pending Setup
+- SQL migration: `ALTER TABLE progress ADD COLUMN IF NOT EXISTS flagged jsonb DEFAULT '{}';`
+- Google OAuth: enable in Supabase Dashboard → Auth → Providers + Google Cloud Console
+- Supabase Auth → URL Configuration → set Site URL to Vercel domain

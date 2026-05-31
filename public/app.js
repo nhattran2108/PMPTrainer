@@ -541,21 +541,38 @@ function confirmImport(){
   importedQuestions=importedQuestions.concat(toAdd);
   localStorage.setItem('pmp_imported',JSON.stringify(importedQuestions));
   
+function isMobile(){ return window.innerWidth<=768; }
+
 function toggleSidebar(){
-  var sb=document.getElementById('sidebar');
-  var ov=document.getElementById('sidebar-overlay');
-  if(!sb) return;
-  var isOpen=sb.classList.contains('open');
-  sb.classList.toggle('open',!isOpen);
-  ov.classList.toggle('open',!isOpen);
+  if(isMobile()){
+    var sb=document.getElementById('sidebar');
+    var ov=document.getElementById('sidebar-overlay');
+    if(!sb) return;
+    var isOpen=sb.classList.contains('open');
+    sb.classList.toggle('open',!isOpen);
+    ov.classList.toggle('open',!isOpen);
+  } else {
+    var closed=document.body.classList.toggle('nav-closed');
+    try{ localStorage.setItem('nav-closed', closed?'1':''); }catch(e){}
+  }
 }
 
 function closeSidebar(){
-  var sb=document.getElementById('sidebar');
-  var ov=document.getElementById('sidebar-overlay');
-  if(sb) sb.classList.remove('open');
-  if(ov) ov.classList.remove('open');
+  if(isMobile()){
+    var sb=document.getElementById('sidebar');
+    var ov=document.getElementById('sidebar-overlay');
+    if(sb) sb.classList.remove('open');
+    if(ov) ov.classList.remove('open');
+  } else {
+    document.body.classList.add('nav-closed');
+    try{ localStorage.setItem('nav-closed','1'); }catch(e){}
+  }
 }
+
+// Restore desktop sidebar state
+(function(){
+  try{ if(localStorage.getItem('nav-closed')) document.body.classList.add('nav-closed'); }catch(e){}
+})();
 
 // Wire hamburger — touchend avoids 300ms iOS click delay
 (function(){
@@ -576,11 +593,16 @@ function closeSidebar(){
   }
 })();
 
-// Close sidebar when navigating on mobile
+// Close sidebar overlay when navigating on mobile
 var origShowView = showView;
 showView = function(name){
   origShowView(name);
-  closeSidebar();
+  if(isMobile()){
+    var sb=document.getElementById('sidebar');
+    var ov=document.getElementById('sidebar-overlay');
+    if(sb) sb.classList.remove('open');
+    if(ov) ov.classList.remove('open');
+  }
 };
 
 // Swipe left on sidebar to close
