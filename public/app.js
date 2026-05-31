@@ -620,6 +620,8 @@ showView = function(name){
     if(sb) sb.classList.remove('open');
     if(ov) ov.classList.remove('open');
   }
+  if(name==='dragdrop') enableDragTouch();
+  else disableDragTouch();
 };
 
 // Swipe left on sidebar to close
@@ -645,10 +647,11 @@ showView = function(name){
 
 
 // Touch-to-drag support for mobile drag & drop
+// Listeners are attached only when on drag-drop view to avoid blocking scroll everywhere else
 var touchDragItem = null;
 var touchClone = null;
 
-document.addEventListener('touchstart', function(e){
+function _onDragTouchStart(e){
   var item = e.target.closest('.drag-item');
   if(!item || item.classList.contains('placed')) return;
   touchDragItem = item.getAttribute('data-item') || item.textContent;
@@ -661,14 +664,13 @@ document.addEventListener('touchstart', function(e){
   document.body.appendChild(touchClone);
   item.classList.add('dragging');
   e.preventDefault();
-}, {passive:false});
+}
 
-document.addEventListener('touchmove', function(e){
+function _onDragTouchMove(e){
   if(!touchClone) return;
   var t = e.touches[0];
   touchClone.style.left = (t.clientX - 40) + 'px';
   touchClone.style.top = (t.clientY - 20) + 'px';
-  // Highlight drop zone under finger
   var elUnder = document.elementFromPoint(t.clientX, t.clientY);
   document.querySelectorAll('.drop-zone').forEach(function(z){ z.classList.remove('drag-over'); });
   if(elUnder){
@@ -676,7 +678,20 @@ document.addEventListener('touchmove', function(e){
     if(zone) zone.classList.add('drag-over');
   }
   e.preventDefault();
-}, {passive:false});
+}
+
+function enableDragTouch(){
+  document.addEventListener('touchstart', _onDragTouchStart, {passive:false});
+  document.addEventListener('touchmove', _onDragTouchMove, {passive:false});
+}
+
+function disableDragTouch(){
+  document.removeEventListener('touchstart', _onDragTouchStart);
+  document.removeEventListener('touchmove', _onDragTouchMove);
+  touchDragItem = null;
+  if(touchClone && touchClone.parentNode) touchClone.parentNode.removeChild(touchClone);
+  touchClone = null;
+}
 
 document.addEventListener('touchend', function(e){
   if(!touchClone) return;
